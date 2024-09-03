@@ -1,0 +1,18 @@
+(*Input: A list of probabilities of all kinds of objects to be sampled.*)
+(*Output: Expectation of times of sampling until every kind has been taken.*)
+Function[Prob, Module[{num, len, ProbMat, NumList},
+  num = Length[Prob];
+  len = 2^num;
+  ProbMat = Table[0, {i, len}, {j, len}];
+  NumList = Range[num];
+  Map[Function[A, Module[{i, CA},
+     i = Total[2^(A - 1)] + 1;
+     CA = Complement[NumList, A];
+     Map[Function[b, ProbMat[[i, i + 2^(b - 1)]] = Prob[[b]];]
+      , CA];
+     ProbMat[[i, i]] = 1 - Total[Prob[[CA]]];
+     ]]
+   , Subsets[NumList]];
+  LinearSolve[ProbMat - IdentityMatrix[len], 
+    Append[Table[-1, len - 1], 0]][[1]]
+  ]]
